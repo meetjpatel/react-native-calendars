@@ -9,14 +9,14 @@ export default function(theme={}) {
     header: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      paddingLeft: 10,
-      paddingRight: 10,
+      paddingLeft: '18%',
+      paddingRight: '18%',
       alignItems: 'center'
     },
     monthText: {
       fontSize: appStyle.textMonthFontSize,
-      fontFamily: appStyle.textMonthFontFamily,
-      fontWeight: appStyle.textMonthFontWeight,
+      fontFamily: 'Lato-Regular',
+      fontWeight: '700',
       color: appStyle.monthTextColor,
       margin: 10
     },
@@ -26,17 +26,21 @@ export default function(theme={}) {
     arrowImage: {
       ...Platform.select({
         ios: {
-          tintColor: appStyle.arrowColor
+          //tintColor: appStyle.arrowColor
+          height: 20,
+          width: 20,
         },
         android: {
-          tintColor: appStyle.arrowColor
+          //tintColor: appStyle.arrowColor
+          height: 20,
+          width: 20,
         }
       })
     },
     week: {
       marginTop: 7,
       flexDirection: 'row',
-      justifyContent: 'space-around'
+      justifyContent: 'space-around',
     },
     dayHeader: {
       marginTop: 2,
@@ -44,7 +48,7 @@ export default function(theme={}) {
       width: 32,
       textAlign: 'center',
       fontSize: appStyle.textDayHeaderFontSize,
-      fontFamily: appStyle.textDayHeaderFontFamily,
+      fontFamily: 'Lato-Regular',
       color: appStyle.textSectionTitleColor
     },
     ...(theme[STYLESHEET_ID] || {})

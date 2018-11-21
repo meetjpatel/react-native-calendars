@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+//import _ from 'lodash';
 import {
   TouchableWithoutFeedback,
   Text,
   View
 } from 'react-native';
-import {shouldUpdate} from '../../../component-updater';
-import isEqual from 'lodash.isequal';
 
 import * as defaultStyle from '../../../style';
 import styleConstructor from './style';
@@ -14,14 +13,13 @@ import styleConstructor from './style';
 class Day extends Component {
   static propTypes = {
     // TODO: selected + disabled props should be removed
-    state: PropTypes.oneOf(['selected', 'disabled', 'today', '']),
+    state: PropTypes.oneOf(['selected', 'disabled', 'today', 'crossed', 'disableTouch', '']),
 
     // Specify theme properties to override specific styles for calendar parts. Default = {}
     theme: PropTypes.object,
     marking: PropTypes.any,
 
     onPress: PropTypes.func,
-    onLongPress: PropTypes.func,
     date: PropTypes.object,
 
     markingExists: PropTypes.bool,
@@ -33,26 +31,26 @@ class Day extends Component {
     this.style = styleConstructor(props.theme);
     this.markingStyle = this.getDrawingStyle(props.marking || []);
     this.onDayPress = this.onDayPress.bind(this);
-    this.onDayLongPress = this.onDayLongPress.bind(this);
   }
 
   onDayPress() {
     this.props.onPress(this.props.date);
   }
 
-  onDayLongPress() {
-    this.props.onLongPress(this.props.date);
-  }
-
   shouldComponentUpdate(nextProps) {
     const newMarkingStyle = this.getDrawingStyle(nextProps.marking);
 
-    if (!isEqual(this.markingStyle, newMarkingStyle)) {
+    if (JSON.stringify(this.markingStyle) !== JSON.stringify(newMarkingStyle)) {
       this.markingStyle = newMarkingStyle;
       return true;
     }
 
-    return shouldUpdate(this.props, nextProps, ['state', 'children', 'onPress', 'onLongPress']);
+    return ['state', 'children'].reduce((prev, next) => {
+      if (prev || nextProps[next] !== this.props[next]) {
+        return true;
+      }
+      return prev;
+    }, false);
   }
 
   getDrawingStyle(marking) {
@@ -112,6 +110,18 @@ class Day extends Component {
     return resultStyle;
   }
 
+  showCross = () => {
+    if(this.props.markedDates){
+        if(Object.keys(this.props.markedDates).find((a)=>(a==this.props.date.dateString))){
+            if(this.props.markedDates[this.props.date.dateString].crossed){
+                return(<View style={{height: 28, width: 1, backgroundColor: '#979797', transform: [{ rotate: '-45deg'}], position: 'absolute', alignSelf: 'center', top: 2, marginLeft: 2}}/>)
+            }
+        }else {
+            return(<View/>)
+        }
+    }
+  }
+
   render() {
     const containerStyle = [this.style.base];
     const textStyle = [this.style.text];
@@ -120,16 +130,17 @@ class Day extends Component {
     let fillerStyle = {};
     let fillers;
 
-    if (this.props.state === 'disabled') {
+    if (this.props.state === 'disabled' || this.props.state === 'disableTouch') {
       textStyle.push(this.style.disabledText);
     } else if (this.props.state === 'today') {
-      containerStyle.push(this.style.today);
       textStyle.push(this.style.todayText);
+    } else if (this.props.state === 'crossed') {
+      textStyle.push({color: '#979797'});
     }
 
     if (this.props.marking) {
       containerStyle.push({
-        borderRadius: 17
+        borderRadius: 8
       });
 
       const flags = this.markingStyle;
@@ -190,15 +201,14 @@ class Day extends Component {
         </View>
       );
     }
-
+    //console.log("this.props.state",this.props.state);
     return (
-      <TouchableWithoutFeedback
-        onPress={this.onDayPress}
-        onLongPress={this.onDayLongPress}>
+      <TouchableWithoutFeedback disabled={this.props.state === 'crossed' || this.props.state === 'disableTouch'} onPress={this.onDayPress}>
         <View style={this.style.wrapper}>
           {fillers}
           <View style={containerStyle}>
             <Text allowFontScaling={false} style={textStyle}>{String(this.props.children)}</Text>
+            {this.showCross()}
           </View>
         </View>
       </TouchableWithoutFeedback>

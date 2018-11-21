@@ -9,6 +9,7 @@ export default function styleConstructor(theme={}) {
   const appStyle = {...defaultStyle, ...theme};
   return StyleSheet.create({
     wrapper: {
+      flex: 1,
       alignItems: 'center',
       alignSelf: 'stretch',
       marginLeft: -1
@@ -37,16 +38,14 @@ export default function styleConstructor(theme={}) {
     text: {
       marginTop: 7,
       fontSize: appStyle.textDayFontSize,
-      fontFamily: appStyle.textDayFontFamily,
-      fontWeight: '300',
+      fontFamily: 'Lato-Regular',
+      //fontWeight: '300',
       color: appStyle.dayTextColor || '#2d4150',
       backgroundColor: 'rgba(255, 255, 255, 0)'
     },
-    today: {
-      backgroundColor: appStyle.todayBackgroundColor
-    },
     todayText: {
-      fontWeight: '500',
+      //fontWeight: '500',
+      fontFamily: 'Lato-Heavy',
       color: theme.todayTextColor || appStyle.dayTextColor,
       //color: appStyle.textLinkColor
     },

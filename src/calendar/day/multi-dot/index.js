@@ -6,8 +6,6 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
-import {shouldUpdate} from '../../../component-updater';
-
 import styleConstructor from './style';
 
 class Day extends Component {
@@ -19,7 +17,6 @@ class Day extends Component {
     theme: PropTypes.object,
     marking: PropTypes.any,
     onPress: PropTypes.func,
-    onLongPress: PropTypes.func,
     date: PropTypes.object
   };
 
@@ -27,19 +24,38 @@ class Day extends Component {
     super(props);
     this.style = styleConstructor(props.theme);
     this.onDayPress = this.onDayPress.bind(this);
-    this.onDayLongPress = this.onDayLongPress.bind(this);
   }
 
   onDayPress() {
     this.props.onPress(this.props.date);
   }
 
-  onDayLongPress() {
-    this.props.onLongPress(this.props.date);
-  }
-
   shouldComponentUpdate(nextProps) {
-    return shouldUpdate(this.props, nextProps, ['state', 'children', 'marking', 'onPress', 'onLongPress']);
+    const changed = ['state', 'children', 'marking', 'onPress'].reduce((prev, next) => {
+      if (prev) {
+        return prev;
+      } else if (nextProps[next] !== this.props[next]) {
+        return next;
+      }
+      return prev;
+    }, false);
+    if (changed === 'marking') {
+      let markingChanged = false;
+      if (this.props.marking && nextProps.marking) {
+        markingChanged = (!(
+          this.props.marking.marking === nextProps.marking.marking
+          && this.props.marking.selected === nextProps.marking.selected
+          && this.props.marking.disabled === nextProps.marking.disabled
+          && this.props.marking.dots === nextProps.marking.dots));
+      } else {
+        markingChanged = true;
+      }
+      // console.log('marking changed', markingChanged);
+      return markingChanged;
+    } else {
+      // console.log('changed', changed);
+      return !!changed;
+    }
   }
 
   renderDots(marking) {
@@ -49,7 +65,7 @@ class Day extends Component {
       const validDots = marking.dots.filter(d => (d && d.color));
       return validDots.map((dot, index) => {
         return (
-          <View key={dot.key ? dot.key : index} style={[baseDotStyle,
+          <View key={dot.key ? dot.key : index} style={[baseDotStyle, 
             { backgroundColor: marking.selected && dot.selectedDotColor ? dot.selectedDotColor : dot.color}]}/>
         );
       });
@@ -73,14 +89,10 @@ class Day extends Component {
     } else if (typeof marking.disabled !== 'undefined' ? marking.disabled : this.props.state === 'disabled') {
       textStyle.push(this.style.disabledText);
     } else if (this.props.state === 'today') {
-      containerStyle.push(this.style.today);
       textStyle.push(this.style.todayText);
     }
     return (
-      <TouchableOpacity
-        style={containerStyle}
-        onPress={this.onDayPress}
-        onLongPress={this.onDayLongPress}>
+      <TouchableOpacity style={containerStyle} onPress={this.onDayPress}>
         <Text allowFontScaling={false} style={textStyle}>{String(this.props.children)}</Text>
         <View style={{flexDirection: 'row'}}>{dot}</View>
       </TouchableOpacity>

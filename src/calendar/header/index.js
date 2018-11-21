@@ -5,10 +5,6 @@ import XDate from 'xdate';
 import PropTypes from 'prop-types';
 import styleConstructor from './style';
 import { weekDayNames } from '../../dateutils';
-import {
-  CHANGE_MONTH_LEFT_ARROW,
-  CHANGE_MONTH_RIGHT_ARROW
-} from '../../testIDs';
 
 class CalendarHeader extends Component {
   static propTypes = {
@@ -23,10 +19,6 @@ class CalendarHeader extends Component {
     weekNumbers: PropTypes.bool,
     onPressArrowLeft: PropTypes.func,
     onPressArrowRight: PropTypes.func
-  };
-
-  static defaultProps = {
-    monthFormat: 'MMMM yyyy',
   };
 
   constructor(props) {
@@ -63,6 +55,12 @@ class CalendarHeader extends Component {
   }
 
   onPressLeft() {
+    let currentMonth = new Date().getMonth() + 1;
+    let currentYear = new Date().getFullYear()
+    let yearOfSelectedMonth = new Date(this.props.month).getFullYear()
+
+    if((currentMonth.toString() == this.props.month.toString('M')) && (yearOfSelectedMonth == currentYear)) return;
+
     const {onPressArrowLeft} = this.props;
     if(typeof onPressArrowLeft === 'function') {
       return onPressArrowLeft(this.substractMonth);
@@ -87,28 +85,21 @@ class CalendarHeader extends Component {
         <TouchableOpacity
           onPress={this.onPressLeft}
           style={this.style.arrow}
-          hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
-          testID={CHANGE_MONTH_LEFT_ARROW}
         >
           {this.props.renderArrow
             ? this.props.renderArrow('left')
             : <Image
-                source={require('../img/previous.png')}
+                source={require('../img/calendarPrevious.png')}
                 style={this.style.arrowImage}
               />}
         </TouchableOpacity>
       );
       rightArrow = (
-        <TouchableOpacity
-          onPress={this.onPressRight}
-          style={this.style.arrow}
-          hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
-          testID={CHANGE_MONTH_RIGHT_ARROW}
-        >
+        <TouchableOpacity onPress={this.onPressRight} style={this.style.arrow}>
           {this.props.renderArrow
             ? this.props.renderArrow('right')
             : <Image
-                source={require('../img/next.png')}
+                source={require('../img/calendarNext.png')}
                 style={this.style.arrowImage}
               />}
         </TouchableOpacity>
@@ -120,11 +111,11 @@ class CalendarHeader extends Component {
     }
     return (
       <View>
-        <View style={this.style.header}>
+        <View style={[this.style.header, {alignSelf: 'center'}]}>
           {leftArrow}
           <View style={{ flexDirection: 'row' }}>
             <Text allowFontScaling={false} style={this.style.monthText} accessibilityTraits='header'>
-              {this.props.month.toString(this.props.monthFormat)}
+              {this.props.month.toString(this.props.monthFormat ? this.props.monthFormat : 'MMMM yyyy')}
             </Text>
             {indicator}
           </View>
@@ -132,11 +123,12 @@ class CalendarHeader extends Component {
         </View>
         {
           !this.props.hideDayNames &&
-          <View style={this.style.week}>
+          <View style={[this.style.week, {marginHorizontal: _isPad ? '5%' : '2%'}]}>
             {this.props.weekNumbers && <Text allowFontScaling={false} style={this.style.dayHeader}></Text>}
             {weekDaysNames.map((day, idx) => (
-              <Text allowFontScaling={false} key={idx} accessible={false} style={this.style.dayHeader} numberOfLines={1} importantForAccessibility='no'>{day}</Text>
+              <Text allowFontScaling={false} key={idx} accessible={false} style={this.style.dayHeader} numberOfLines={1}>{day=='Tue'?'Tues':(day=='Thu'?'Thur':day)}</Text>
             ))}
+              <View style={{height:0.5, backgroundColor: '#E0DFDF', position: 'absolute', width: '100%', bottom: -5, alignSelf: 'center'}}/>
           </View>
         }
       </View>

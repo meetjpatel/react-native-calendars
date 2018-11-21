@@ -12,9 +12,9 @@ export default function styleConstructor(theme={}) {
       alignItems: 'center'
     },
     text: {
-      marginTop: Platform.OS === 'android' ? 4 : 6,
+      marginTop: 4,
       fontSize: appStyle.textDayFontSize,
-      fontFamily: appStyle.textDayFontFamily,
+      fontFamily: 'Lato-Regular',
       fontWeight: '300',
       color: appStyle.dayTextColor,
       backgroundColor: 'rgba(255, 255, 255, 0)'
@@ -25,9 +25,6 @@ export default function styleConstructor(theme={}) {
     selected: {
       backgroundColor: appStyle.selectedDayBackgroundColor,
       borderRadius: 16
-    },
-    today: {
-      backgroundColor: appStyle.todayBackgroundColor
     },
     todayText: {
       color: appStyle.todayTextColor
